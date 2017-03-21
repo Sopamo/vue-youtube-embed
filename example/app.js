@@ -1,6 +1,6 @@
 'use strict'
+/*global Vue VueYouTubeEmbed:true*/
 Vue.use(VueYouTubeEmbed)
-var events = VueYouTubeEmbed.events
 
 window.app = new Vue({
   el: '#app',
@@ -11,35 +11,59 @@ window.app = new Vue({
     width: '640',
     height: '390'
   },
-  events: {
-    [events.READY]: function(player) {
-      console.log(events.READY, player)
-      this.player = player
-    },
-    [events.PLAYING]: function(player) {
-      console.log(events.PLAYING, player)
-    },
-    [events.ENDED]: function(player) {
-      console.log(events.ENDED, player)
-    }
-  },
   methods: {
-    pause() {
+    pause: function () {
       this.player.pauseVideo()
     },
-    next() {
+    next: function () {
       this.videoId = this.nextId
       this.nextId = ''
     },
-    add() {
-      this.videos.push({videoId: this.nextId})
+    add: function () {
+      this.videos.push({ videoId: this.nextId })
       this.nextId = ''
+    },
+    remove: function () {
+      this.videos.pop()
     }
   },
   components: {
     VideoList: {
       props: ['video'],
-      template: '<div><h2>video: {{video}}</h2><div v-youtube.url="video"></div></div>'
+      data: function () {
+        return {
+          log: []
+        }
+      },
+      filters: {
+        url: VueYouTubeEmbed.getIdFromURL
+      },
+      template: `
+        <div>
+          <h2>video: {{video}}</h2>
+          <youtube :video-id="video | url"
+            @ready="ready"
+            @ended="ended"
+            @playing="playing"
+            @paused="paused"
+            @buffering="buffering"
+            @qued="qued">
+          </youtube>
+          <ol><li v-for="item in log">type: {{item.type}}</li></ol>
+        </div>`,
+      methods: (function () {
+        var events = ['ready', 'ended', 'playing', 'paused', 'buffering', 'queued']
+        var methods = {}
+
+        events.forEach(function (event) {
+          methods[event] = function (player) {
+            console.log({ type: event, player: player })
+            this.log.push({ type: event })
+          }
+        })
+
+        return methods
+      })()
     }
   }
 })
