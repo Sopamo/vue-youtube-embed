@@ -6,6 +6,7 @@ import PlayerVars from './PlayerVars.vue'
 import UpdateVideoId from './UpdateVideoId.vue'
 import List from './List.vue'
 import Volume from './Volume.vue'
+import Preview from './Preview.vue'
 
 play('Vue YouTube Embed', module)
   .add('Events', Events)
@@ -14,3 +15,4 @@ play('Vue YouTube Embed', module)
   .add('Update Video ID', UpdateVideoId)
   .add('List', List)
   .add('Volume', Volume)
+  .add('Preview', Preview)
